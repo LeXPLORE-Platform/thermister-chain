@@ -30,10 +30,14 @@ class TemperatureChainGeneral(GenericInstrument):
             'temp': {'var_name': 'temp', 'dim': ('depth', 'time',), 'unit': 'degC', 'long_name': 'temperature'},
         }
 
-    def gradient_check(self):
+    def gradient_check(self, gradients):
         self.log.info("Performing additional gradient check on temperature data.", indent=2)
         self.data["temp_qual"] = temperature_gradient_check(self.data["depth"], self.data["temp"],
-                                                            self.data["temp_qual"])
+                                                            self.data["temp_qual"],
+                                                            time_epilimnion_grad_threshold=gradients["time_epilimnion_grad_threshold"],
+                                                            time_hypolimnion_grad_threshold=gradients["time_hypolimnion_grad_threshold"],
+                                                            depth_grad_threshold=gradients["depth_grad_threshold"],
+                                                            perc_good=gradients["perc_good"])
 
     def decimate_data(self, mins):
         self.log.info("Decimating data to {}min periods.".format(mins), indent=2)
@@ -136,8 +140,9 @@ class TemperatureChainV0(TemperatureChainGeneral):
     def read_data(self, file):
         self.log.info("Reading data from {}".format(file), 1)
         try:
-            depths = [18, 17, 16, 15, 14, 13, 12, 11, 10,  9,  8,  7, 6,  5,  4,  3,  2.5, 2, 1.5, 1.25, 1, 0.75, 0.5,
-                      0.25, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24, 21]
+            depths = [18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2.5, 2, 1.5, 1.25, 1, 0.75, 0.5,
+                      0.25, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24,
+                      21]
 
             self.log.info("Locating partner file", 2)
 
@@ -163,7 +168,7 @@ class TemperatureChainV0(TemperatureChainGeneral):
             df.columns = depths
             df = df.reindex(sorted(df.columns), axis=1)
 
-            self.data["time"] = np.array(df.index.astype(int) / 10**9)
+            self.data["time"] = np.array(df.index.astype(int) / 10 ** 9)
             self.data["depth"] = np.array(df.columns)
             self.data["temp"] = np.array(df.T.to_numpy())
         except Exception as e:

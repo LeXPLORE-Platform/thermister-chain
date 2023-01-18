@@ -122,6 +122,8 @@ class GenericInstrument:
                 "Writing {} data from {} until {} to NetCDF file {}".format(title, file_start, file_end, filename),
                 indent=2)
 
+            valid_time = (time >= datetime.timestamp(file_start)) & (time < datetime.timestamp(file_end))
+
             if not os.path.isfile(out_file):
                 self.log.info("Creating new file.", indent=3)
                 with netCDF4.Dataset(out_file, mode='w', format='NETCDF4') as nc:
@@ -143,7 +145,18 @@ class GenericInstrument:
                             else:
                                 raise ValueError("Failed to write variable {} with dimensions: {} to file".format(key, ", ".join(values["dim"])))
                         else:
-                            var[:] = data[key]
+                            if len(values["dim"]) == 1:
+                                if values["dim"][0] == time_label:
+                                    var[:] = data[key][valid_time]
+                                else:
+                                    var[:] = data[key]
+                            elif len(values["dim"]) == 2:
+                                if values["dim"][0] == time_label:
+                                    var[:] = data[key][valid_time, :]
+                                elif values["dim"][1] == time_label:
+                                    var[:] = data[key][:, valid_time]
+                            else:
+                                raise ValueError("Failed to write variable {} with dimensions: {} to file".format(key, ", ".join(values["dim"])))
             else:
                 self.log.info("Editing existing file.", indent=3)
                 with netCDF4.Dataset(out_file, mode='a', format='NETCDF4') as nc:
@@ -193,8 +206,6 @@ class GenericInstrument:
                         if np.all(np.isin(time, nc_time)) and not overwrite:
                             self.log.info("Data already exists in NetCDF, skipping.", indent=3)
                         else:
-                            valid_time = (time >= datetime.timestamp(file_start)) & (
-                                        time < datetime.timestamp(file_end))
                             non_duplicates = ~np.isin(time, nc_time)
                             valid = np.logical_and(valid_time, non_duplicates)
                             combined_time = np.append(nc_time, time[valid])

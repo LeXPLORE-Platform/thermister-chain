@@ -2,7 +2,7 @@
 import os
 import sys
 import yaml
-from instruments import TemperatureChainV0, TemperatureChainV1, TemperatureChainV2
+from instruments import TemperatureChainV0, TemperatureChainV1, TemperatureChainV2, TemperatureChainGeneral
 from general.functions import logger, maintenance, files_in_directory
 from functions import pre_process
 
@@ -31,16 +31,33 @@ log.end_stage()
 
 log.begin_stage("Processing data to L1")
 for file in files:
-    if "/v0/0-18m_depth" in file and "062944_20191022_0849" not in file:
+    if "/v0/0-18m_depth" in file:
         continue
         version = "v0"
+        gradients = False
+        interpolate = False
         sensor = TemperatureChainV0(log=log)
     elif "/v1/" in file:
+        continue
         version = "v1"
+        gradients = {
+            "time_epilimnion_grad_threshold": 1.5,
+            "time_hypolimnion_grad_threshold": 0.4,
+            "depth_grad_threshold": 1,
+            "perc_good": 0.5
+        }
+        interpolate = True
         sensor = TemperatureChainV1(log=log)
     elif "/v2/" in file:
         continue
         version = "v2"
+        gradients = {
+            "time_epilimnion_grad_threshold": 1.5,
+            "time_hypolimnion_grad_threshold": 0.4,
+            "depth_grad_threshold": 1,
+            "perc_good": 0.5
+        }
+        interpolate = False
         sensor = TemperatureChainV2(log=log)
     else:
         continue
@@ -50,27 +67,31 @@ for file in files:
 
     if sensor.read_data(file):
         sensor.quality_assurance(file_path="notes/quality_assurance.json")
-        sensor.gradient_check()
+        if gradients:
+            sensor.gradient_check(gradients)
         sensor.export(directories["Level1"], "L1_LexploreTemperatureChain_" + version, output_period="weekly")
         sensor.mask_data()
         sensor.decimate_data(10)
-        sensor.interpolate_data("temp")
+        if interpolate:
+            sensor.interpolate_data("temp")
         sensor.surface_and_bottom_values()
         sensor.compute_physical_quantities(bathymetry_file="notes/bathymetry.csv")
         sensor.export(directories["Level2"], "L2_LexploreTemperatureChain_" + version, output_period="monthly")
 log.end_stage()
 
-"""
+
 log.begin_stage("Applying Temperature chain Maintenance Periods")
-effected_files = maintenance(directories["Level1_TemperatureChain"], file="notes/temperaturechain_events.csv", datalakes=[])
+effected_files = maintenance(directories["Level1"], file="notes/events.csv", datalakes=[])
 for file in effected_files:
-    sensor = TemperatureChain(log=log)
+    version = file.split("_")[-3]
+    sensor = TemperatureChainGeneral(log=log)
     sensor.read_netcdf_data(file)
     sensor.mask_data()
     sensor.decimate_data(10)
-    sensor.interpolate_data("temp")
+    if version == "v1":
+        sensor.interpolate_data("temp")
     sensor.surface_and_bottom_values()
     sensor.compute_physical_quantities(bathymetry_file="notes/bathymetry.csv")
-    sensor.export(directories["Level2_TemperatureChain"], "L2_MurtenTemperatureChain", output_period="monthly", overwrite=True)
+    sensor.export(directories["Level2"], "L2_LexploreTemperatureChain_" + version, output_period="monthly", overwrite=True)
 log.end_stage()
-"""
+

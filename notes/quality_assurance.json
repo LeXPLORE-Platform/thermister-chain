@@ -1,0 +1,4 @@
+{
+  "time": {"simple": {"numeric": "True", "bounds": [1514764800, "now"]}, "advanced": {}},
+  "temp": {"simple": {"numeric": "True", "bounds": [4, 40]}, "advanced": {}}
+}

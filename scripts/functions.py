@@ -20,9 +20,9 @@ def get_bathymetry(file, depth):
     return depth, area
 
 
-def pre_process(infile, level0, process):
+def pre_process(infile, version, level0, process):
     for row in open(infile, "r"):
-        local = os.path.join(level0, "LeXPLORE_EAST_TempChain_" + row[1:11] + ".dat")
+        local = os.path.join(level0, version, "LeXPLORE_EAST_TempChain_" + row[1:11] + ".dat")
         temp = process + "LeXPLORE_EAST_TempChain_" + row[1:11] + ".dat"
         if os.path.isfile(local):
             os.rename(local, temp)

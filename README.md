@@ -30,9 +30,14 @@ Lake Geneva [46.50, 6.66]
 
 ## Sensors
 
-The thermister chain is a linked set of temperature sensors at set depths beneath the water surface. 
+The Temperature Chain measures the temperature at various depths at a 10 seconds resolution. The chain is located at the LéXPLORE platform (46°30’0.819″ N, 6°39’39.007″ E) 
 
-***NEEDS TO BE COMPLETED***
+### Thermistor Chain
+- **Brand, Model & SN**: RBR, Concerto T24, 0.25 m to 18 m : SN 62944,  21 m to 90 m SN 62955 or SN 206659, see `sensor_history`
+- **System integration**: Data logged into a cambell scientific CR6, loggernet for near realtime transmission 
+- **Initial Accuracy**: ±0.005 °C
+- **Setup** depth of the sensors(m): 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 24, 27, 30, 33, 36, 39 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, sampling period: 10 min
+
 
 ## Code
 

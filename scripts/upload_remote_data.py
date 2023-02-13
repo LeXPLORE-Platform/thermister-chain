@@ -1,6 +1,5 @@
 import os
 import sys
-import boto3
 import argparse
 from subprocess import check_output, Popen, PIPE
 
@@ -15,10 +14,19 @@ def upload_remote_data(warning=True, delete=False):
     if not os.path.isdir(data_folder):
         raise ValueError("{} not found. data folder is required to sync data.".format(data_folder))
 
-    remote = str(check_output(["git", "remote", "-v"])).split("@", 1)[1].split(".git", 1)[0].split(":")
-    host = remote[0]
-    group = remote[1].split("/")[0]
-    repository = remote[1].split("/")[1]
+    remote = str(check_output(["git", "remote", "-v"]))
+    if "git@" in remote:
+        remote = str(check_output(["git", "remote", "-v"])).split("git@", 1)[1].split(".git", 1)[0].split(":")
+        host = remote[0]
+        group = remote[1].split("/")[0]
+        repository = remote[1].split("/")[1]
+    elif "https://" in remote:
+        remote = str(check_output(["git", "remote", "-v"])).split("https://", 1)[1].split(".git", 1)[0].split("/")
+        host = remote[0]
+        group = remote[-2]
+        repository = remote[-1]
+    else:
+        raise ValueError("Unrecognized output from git remote -v: {}".format(remote))
 
     if warning and host not in hosts:
         raise ValueError("Host {} not recognised. Please select from {} or edit the function to accept your host."

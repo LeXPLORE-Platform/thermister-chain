@@ -5,7 +5,7 @@ from subprocess import check_output, Popen, PIPE
 
 
 def upload_remote_data(warning=True, delete=False):
-    hosts = ["renkulab.io", "github.com", "gitlab.com"]
+    hosts = ["renkulab.io", "github.com", "gitlab.com", "gitlab.renkulab.io"]
     folder = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), ".."))
     bucket_file = os.path.join(folder, ".bucket")
     data_folder = os.path.join(folder, "data")

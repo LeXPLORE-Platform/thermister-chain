@@ -35,8 +35,19 @@ class GenericInstrument:
         else:
             self.log = logger()
 
-    def quality_assurance(self, file_path='./quality_assurance.json', valid=False, time_label="time"):
+    def quality_assurance(self, file_path='./quality_assurance.json', maintenance_file=False, valid=False, time_label="time"):
         self.log.info("Applying quality assurance", indent=2)
+
+        if maintenance_file:
+            df = pd.read_csv(maintenance_file, sep=";")
+            df["start"] = pd.to_datetime(df['start'], format='%Y%m%d %H:%M:%S', utc=True).astype('int64') // 10**9
+            df["stop"] = pd.to_datetime(df['stop'], format='%Y%m%d %H:%M:%S', utc=True)
+            df['stop'] = df['stop'].fillna(pd.Timestamp.now(tz='UTC'))
+            df["stop"] = df["stop"].astype('int64') // 10**9
+            min_date = min(self.data["time"])
+            max_date = max(self.data["time"])
+            df = df[(df['start'] < max_date) & (df['stop'] > min_date)]
+            df['depth'] = df['depth'].apply(lambda x: parse_depth_to_index(x, list(self.data["depth"])))
 
         if not os.path.exists(file_path):
             self.log.warning("Cannot find QA file: {}, no QA applied.".format(file_path), indent=2)
@@ -59,6 +70,12 @@ class GenericInstrument:
                             if min(time) < valid[0] < max(time) and min(time) < valid[1] < max(time):
                                 qa[time < valid[0]] = 1
                                 qa[time > valid[1]] = 1
+                        if maintenance_file and key=="temp":
+                            time = np.array(self.data[time_label])
+                            for index, row in df.iterrows():
+                                indices = np.where((time >= row["start"]) & (time <= row["stop"]))[0]
+                                for d in row["depth"]:
+                                    qa[d, indices] = 1
                         self.data[name] = qa
         except:
             self.log.error("Unable to apply QA file, this is likely due to bad formatting of the file.")
@@ -565,6 +582,19 @@ def json_converter(qa):
         return qa
     except:
         return qa
+
+
+def parse_depth_to_index(string, depths):
+    if string.lower() == "all":
+        return list(range(len(depths)))
+    elif len(string.split(",")) > 1:
+        return [depths.index(float(d)) for d in string.split(",")]
+    elif "-" in string:
+        parts = string.split("-")
+        return [depths.index(d) for d in depths if d >= float(parts[0]) and d <= float(parts[0])]
+    else:
+        return [depths.index(float(string))]
+
 
 
 def geographic_distance(latlng1, latlng2):

@@ -60,7 +60,8 @@ for file in files:
         file = pre_process(file, version, directories["Level0"], directories["Process"])
 
     if sensor.read_data(file):
-        sensor.quality_assurance(file_path="notes/quality_assurance.json")
+        sensor.quality_assurance(file_path="notes/quality_assurance.json", maintenance_file="notes/events.csv")
+        exit()
         if gradients:
             sensor.gradient_check(gradients)
         sensor.export(directories["Level1"], "L1_LexploreTemperatureChain_" + version, output_period="weekly")
@@ -72,21 +73,3 @@ for file in files:
         sensor.compute_physical_quantities(bathymetry_file="notes/bathymetry.csv")
         sensor.export(directories["Level2"], "L2_LexploreTemperatureChain_" + version, output_period="monthly")
 log.end_stage()
-
-exit()
-
-log.begin_stage("Applying Temperature chain Maintenance Periods")
-effected_files = maintenance(directories["Level1"], file="notes/events.csv", datalakes=[])
-for file in effected_files:
-    version = file.split("_")[-3]
-    sensor = TemperatureChainGeneral(log=log)
-    sensor.read_netcdf_data(file)
-    sensor.mask_data()
-    sensor.decimate_data(10)
-    if version == "v1":
-        sensor.interpolate_data("temp")
-    sensor.surface_and_bottom_values()
-    sensor.compute_physical_quantities(bathymetry_file="notes/bathymetry.csv")
-    sensor.export(directories["Level2"], "L2_LexploreTemperatureChain_" + version, output_period="monthly", overwrite=True)
-log.end_stage()
-

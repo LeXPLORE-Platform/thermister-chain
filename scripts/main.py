@@ -61,7 +61,6 @@ for file in files:
 
     if sensor.read_data(file):
         sensor.quality_assurance(file_path="notes/quality_assurance.json", maintenance_file="notes/events.csv")
-        exit()
         if gradients:
             sensor.gradient_check(gradients)
         sensor.export(directories["Level1"], "L1_LexploreTemperatureChain_" + version, output_period="weekly")

@@ -260,6 +260,10 @@ class TemperatureChainV2(TemperatureChainGeneral):
             if len(ind) > 0:
                 df = df.drop(df.index[ind])
 
+            if len(df["Timestamp"]) == 0:
+                self.log.info("No valid data found in {}".format(file), indent=1)
+                return False
+
             self.data["time"] = df["Timestamp"]
             df = df.drop(["Timestamp"], axis=1)
             df = df.reindex(sorted(df.columns), axis=1)

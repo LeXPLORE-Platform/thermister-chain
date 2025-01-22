@@ -103,7 +103,7 @@ start;stop;parameter;depth;comments
 20240813 05:40:00;20241009 14:40:00;All;2;Sensor failure
 20240927 18:20:00;20241009 14:40:00;All;20;Sensor failure
 20241009 11:20:00;20241009 14:40:00;All;All;Chain out of water for cleaning and check
-20241009 10:30:00;;All;7,42;Sensor failure
+20241009 10:30:00;;All;7,17,42;Sensor failure
 20241011 03:40:00;;All;48;Sensor failure
 20241025 11:50:00;;All;20;Sensor failure
 20241106 17:30:00;;All;2;Sensor failure

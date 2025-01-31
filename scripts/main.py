@@ -37,7 +37,7 @@ for file in files:
         gradients = False
         interpolate = False
         sensor = TemperatureChainV0(log=log)
-    elif "/v1/" in file:
+    elif "v1" in file:
         continue
         version = "v1"
         gradients = False

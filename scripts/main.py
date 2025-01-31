@@ -37,16 +37,11 @@ for file in files:
         gradients = False
         interpolate = False
         sensor = TemperatureChainV0(log=log)
-    elif "/v1/" in file:
+    elif "v1" in file:
         continue
         version = "v1"
-        gradients = {
-            "time_epilimnion_grad_threshold": 1.5,
-            "time_hypolimnion_grad_threshold": 0.4,
-            "depth_grad_threshold": 1,
-            "perc_good": 0.5
-        }
-        interpolate = True
+        gradients = False
+        interpolate = False
         sensor = TemperatureChainV1(log=log)
     elif "v2" in file or "Temperature_chain_V2.0" in file:
         version = "v2"

@@ -103,14 +103,25 @@ class TemperatureChainGeneral(GenericInstrument):
 
         bathymetry_depth, bathymetry_area = get_bathymetry(bathymetry_file, self.data['depth'])
 
-        hTH, _ = pylake.thermocline(self.data['temp'], self.data['depth'])
+        #hTH, _ = pylake.thermocline(self.data['temp'], self.data['depth'])
         hML = pylake.mixed_layer(self.data['temp'], self.data['depth'], threshold=1)
         schmidt_stability = pylake.schmidt_stability(self.data['temp'], self.data['depth'], bthA=bathymetry_area,
                                                      bthD=bathymetry_depth, sal=0.2, g=9.81)
         heat_content = pylake.heat_content(self.data['temp'], bthA=bathymetry_area, bthD=bathymetry_depth,
                                            depth=self.data['depth'], s=0.2)
 
-        self.data["thermocline_depth"] = hTH
+        epi_depth,hypo_depth = pylake.metalimnion(self.data['temp'], self.data['depth'], slope=0.5, slope_calc='relative', seasonal=True, mixed_cutoff=1, smooth=True, s=0.2)
+        result = np.empty(len(epi_depth))
+
+        # Compute thermocline depth from epilimnion and hypolimnion depths
+        for i in range(len(epi_depth)):
+            epi_temp = np.interp(epi_depth[i],self.data['depth'],self.data['temp'][:,i])
+            hypo_temp = np.interp(hypo_depth[i],self.data['depth'],self.data['temp'][:,i])
+            meta_temp = (epi_temp + hypo_temp)/2
+            meta_depth = np.interp(-meta_temp,-self.data['temp'][:,i],self.data['depth'])
+            result[i] = meta_depth
+
+        self.data['thermocline_depth'] = result
         self.data["mixed_layer_depth"] = hML
         self.data["schmidt_stability"] = schmidt_stability
         self.data["heat_content"] = heat_content

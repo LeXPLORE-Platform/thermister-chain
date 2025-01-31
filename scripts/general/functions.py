@@ -591,7 +591,7 @@ def parse_depth_to_index(string, depths):
         return [depths.index(float(d)) for d in string.split(",")]
     elif "-" in string:
         parts = string.split("-")
-        return [depths.index(d) for d in depths if d >= float(parts[0]) and d <= float(parts[0])]
+        return [depths.index(d) for d in depths if d >= float(parts[0]) and d <= float(parts[1])]
     else:
         return [depths.index(float(string))]
 

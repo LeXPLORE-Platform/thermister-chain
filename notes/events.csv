@@ -30,6 +30,7 @@ start;stop;parameter;depth;comments
 20220824 12:00:00;20220824 16:00:00;All;All;Sensor failure
 20221021 00:00:00;20221028 00:00:00;All;0-18;No data because of broken cable. New cable installed
 20221117 00:00:00;20221120 00:00:00;All;0-18;Sensor failure
+20221207 05:00:00;20221229 00:00:00;All;0.5;Sensor failure
 20221229 00:00:00;20230101 00:00:00;All;0-18;Sensor failure
 20230105 09:40:00;20230111 14:30:00;All;All;Recovery for maintenance. New lower chain position from 24 to 93m every 3m. New upper chain from 0 to 23m every meter
 20230111 14:30:00;20230808 00:00:00;All;23;Sensor failure
@@ -61,3 +62,7 @@ start;stop;parameter;depth;comments
 20240813 05:40:00;20241009 14:40:00;All;2;Sensor failure
 20240927 18:20:00;20241009 14:40:00;All;20;Sensor failure
 20241009 11:20:00;20241009 14:40:00;All;All;Chain out of water for cleaning and check
+20241009 10:30:00;;All;7,17,42;Sensor failure
+20241011 03:40:00;;All;48;Sensor failure
+20241025 11:50:00;;All;20;Sensor failure
+20241106 17:30:00;;All;2;Sensor failure

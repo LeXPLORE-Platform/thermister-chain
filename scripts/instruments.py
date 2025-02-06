@@ -4,7 +4,7 @@ import math
 import json
 import pylake
 import warnings
-import pyrsktools
+from pyrsktools import RSK
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -162,14 +162,20 @@ class TemperatureChainV0(TemperatureChainGeneral):
                 if file.split("_")[-2] in f:
                     deep_file = os.path.join(folder, f)
 
-            shallow_chain = pyrsktools.open(file)
-            s_data = shallow_chain.npsamples()
-
-            deep_chain = pyrsktools.open(deep_file)
-            d_data = deep_chain.npsamples()
+            shallow_chain = RSK(file)
+            shallow_chain.open()
+            shallow_chain.readdata()
+            s_data = shallow_chain.data
+            shallow_chain.close()
 
             dfs = pd.DataFrame(s_data)
             dfs = dfs.resample('5S', on='timestamp').median()
+
+            deep_chain = RSK(deep_file)
+            deep_chain.open()
+            deep_chain.readdata()
+            d_data = deep_chain.data
+            deep_chain.close()
 
             dfd = pd.DataFrame(d_data)
             dfd = dfd.resample('5S', on='timestamp').median()

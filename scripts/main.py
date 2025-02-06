@@ -32,13 +32,11 @@ log.end_stage()
 log.begin_stage("Processing data to L1")
 for file in files:
     if "/v0/0-18m_depth" in file:
-        continue
         version = "v0"
         gradients = False
         interpolate = False
         sensor = TemperatureChainV0(log=log)
     elif "v1" in file:
-        continue
         version = "v1"
         gradients = False
         interpolate = False

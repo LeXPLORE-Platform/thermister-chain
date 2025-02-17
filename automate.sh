@@ -1,8 +1,11 @@
-cd /home/jamesr/lake-murten-mooring
+#!/bin/bash
 
-/home/jamesr/.pyenv/versions/pylake/bin/python scripts/main.py live
+# Directory containing files
+DIR="/home/runnalja/Desktop/Temperature_v3"
 
-/home/jamesr/.pyenv/versions/pylake/bin/python scripts/upload_remote_data.py -d -w
-
-curl "https://api.datalakes-eawag.ch/update/956"
-curl "https://api.datalakes-eawag.ch/update/1221"
+# Loop through each file in the directory
+for file in "$DIR"/*; do
+    # Run Python script and pass the file as an argument
+    echo "Processing file: $file"
+    python scripts/main.py "$file"
+done

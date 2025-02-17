@@ -2,7 +2,7 @@
 import os
 import sys
 import yaml
-from instruments import TemperatureChainV0, TemperatureChainV1, TemperatureChainV2, TemperatureChainGeneral
+from instruments import TemperatureChainV0, TemperatureChainV1, TemperatureChainV2, TemperatureChainV3
 from general.functions import logger, maintenance, files_in_directory
 from functions import pre_process
 
@@ -46,6 +46,11 @@ for file in files:
         gradients = False
         interpolate = False
         sensor = TemperatureChainV2(log=log)
+    elif "v3" in file or "Temperature_chain_V3.0" in file:
+        version = "v3"
+        gradients = False
+        interpolate = False
+        sensor = TemperatureChainV3(log=log)
     else:
         continue
 

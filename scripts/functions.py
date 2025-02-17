@@ -21,6 +21,7 @@ def get_bathymetry(file, depth):
 
 
 def pre_process(infile, version, level0, process):
+    os.makedirs(os.path.join(level0, version), exist_ok=True)
     for row in open(infile, "r"):
         local = os.path.join(level0, version, "LeXPLORE_EAST_TempChain_" + row[1:11] + ".dat")
         temp = process + "LeXPLORE_EAST_TempChain_" + row[1:11] + ".dat"

@@ -291,3 +291,53 @@ class TemperatureChainV2(TemperatureChainGeneral):
             self.log.info("Failed to read data from {}".format(file), indent=1)
             raise e
         return True
+
+
+class TemperatureChainV3(TemperatureChainGeneral):
+    def __init__(self, *args, **kwargs):
+        super(TemperatureChainV3, self).__init__(*args, **kwargs)
+        self.general_attributes = {
+            "institution": "EPFL",
+            "source": "LéXPLORE Thermistor Chain v3",
+            "references": "LéXPLORE commun instruments guillaume.cunillera@epfl.ch",
+            "history": "See history on Renku",
+            "conventions": "CF 1.7",
+            "comment": "Data from the Thermistor Chain on LéXPLORE Platform in Lake Geneva",
+            "title": "LéXPLORE Thermistor Chain v3"
+        }
+
+    def read_data(self, file):
+        self.log.info("Reading data from {}".format(file), 1)
+        try:
+            df = pd.read_csv(file, header=None)
+
+            df.columns = ["Timestamp", "sample number", 0.25, 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 21, 24, 27, 30, 35, 40,
+                          45, 50, 55, 60, 65, 70, 75, 80, 85, 90]
+            df["Timestamp"] = df["Timestamp"].apply(
+                lambda x: datetime.timestamp(datetime.strptime(x, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc)))
+            df.sort_values(by=['Timestamp'], inplace=True)
+            df = df.apply(pd.to_numeric, errors='coerce')
+
+            for column in ["sample number", "battery", "PTU3"]:
+                if column in df.columns:
+                    df = df.drop([column], axis=1)
+
+            foo = df.isnull().sum(axis=1)
+            ind = np.where(foo == (len(df.columns) - 1))[0]
+            if len(ind) > 0:
+                df = df.drop(df.index[ind])
+
+            if len(df["Timestamp"]) == 0:
+                self.log.info("No valid data found in {}".format(file), indent=1)
+                return False
+
+            self.data["time"] = df["Timestamp"]
+            df = df.drop(["Timestamp"], axis=1)
+            df = df.reindex(sorted(df.columns), axis=1)
+            df = df.reset_index(drop=True)
+            self.data["depth"] = df.columns
+            self.data["temp"] = df.T.to_numpy()
+        except Exception as e:
+            self.log.info("Failed to read data from {}".format(file), indent=1)
+            raise e
+        return True

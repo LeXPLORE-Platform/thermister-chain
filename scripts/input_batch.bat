@@ -7,7 +7,7 @@ SET script="C:\Users\Seatronic 1147\Documents\Data_Lexplore\git\thermister-chain
 SET upload="C:\Users\Seatronic 1147\Documents\Data_Lexplore\git\thermister-chain\scripts\upload_remote_data.py"
 
 :: Input directory
-SET in="C:\Users\Seatronic 1147\Documents\Data_Lexplore\Temperature_chain_V2.0"
+SET in="C:\Users\Seatronic 1147\Documents\Data_Lexplore\Temperature_chain_V3.0\Temperature"
 
 :: Backup directory
-SET backup="C:\Users\Seatronic 1147\Documents\Data_Lexplore\Temperature_chain_V2.0Backup"
+SET backup="C:\Users\Seatronic 1147\Documents\Data_Lexplore\Temperature_chain_V3.0Backup"

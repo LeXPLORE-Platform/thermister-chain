@@ -14,7 +14,7 @@ def download_remote_data(warning=True, delete=False):
     if not os.path.isdir(data_folder):
         raise ValueError("{} not found. data folder is required to sync data.".format(data_folder))
 
-    remote = str(check_output(["git", "remote", "-v"]))
+    remote = str(check_output(["git", "remote", "-v"])).replace(" (push)", "").replace(" (fetch)", "")
     if "git@" in remote:
         remote = str(check_output(["git", "remote", "-v"])).split("git@", 1)[1].split(".git", 1)[0].split(":")
         host = remote[0]

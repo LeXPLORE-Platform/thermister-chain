@@ -329,6 +329,10 @@ class TemperatureChainV3(TemperatureChainGeneral):
                 self.log.info("No valid data found in {}".format(file), indent=1)
                 return False
 
+            if len(df["Timestamp"]) == 1:
+                self.log.info("Only one timestep, skipping until more data available", indent=1)
+                return False
+
             self.data["time"] = df["Timestamp"]
             df = df.drop(["Timestamp"], axis=1)
             df = df.reindex(sorted(df.columns), axis=1)

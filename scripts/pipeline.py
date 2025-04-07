@@ -18,7 +18,7 @@ def pipeline(download=False, process=False, reprocess=False, logs=False, upload=
     failed = False
     if process:
         try:
-            edited_files = main(~reprocess, logs, upload or uploadfiles)
+            edited_files = main(not reprocess, logs, upload or uploadfiles)
         except Exception as e:
             print("Processing failed")
             failed = True

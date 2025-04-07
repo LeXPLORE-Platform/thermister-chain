@@ -7,7 +7,7 @@ import time
 import argparse
 import requests
 from download_remote_data import download_remote_data
-from upload_remote_data import upload_files
+from upload_remote_data import upload_files, sync_files
 from main import main
 
 def pipeline(download=False, process=False, reprocess=False, logs=False, upload=False, uploadfiles=False, datalakes=False):
@@ -15,12 +15,17 @@ def pipeline(download=False, process=False, reprocess=False, logs=False, upload=
         print("Download sync with remote bucket")
         download_remote_data(warning=False, delete=True)
 
+    failed = False
     if process:
-        edited_files = main(~reprocess, logs, upload or uploadfiles)
+        try:
+            edited_files = main(~reprocess, logs, upload or uploadfiles)
+        except Exception as e:
+            print("Processing failed")
+            failed = True
 
-    if upload:
+    if upload or failed:
         print("Upload sync with remote bucket")
-        upload_remote_data(warning=False, delete=True)
+        sync_files(warning=False, delete=True)
     elif uploadfiles:
         print("Uploading edited files to remote bucket")
         upload_files(edited_files)

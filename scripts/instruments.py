@@ -167,7 +167,7 @@ class TemperatureChainV0(TemperatureChainGeneral):
             shallow_chain.close()
 
             dfs = pd.DataFrame(s_data)
-            dfs = dfs.resample('5S', on='timestamp').median()
+            dfs = dfs.resample('60s', on='timestamp').median()
 
             deep_chain = RSK(deep_file)
             deep_chain.open()
@@ -176,14 +176,14 @@ class TemperatureChainV0(TemperatureChainGeneral):
             deep_chain.close()
 
             dfd = pd.DataFrame(d_data)
-            dfd = dfd.resample('5S', on='timestamp').median()
+            dfd = dfd.resample('60s', on='timestamp').median()
 
             df = dfs.join(dfd, how="outer", lsuffix="_s", rsuffix="_d")
 
             df.columns = depths
             df = df.reindex(sorted(df.columns), axis=1)
 
-            self.data["time"] = np.array(df.index.astype(int) / 10 ** 9)
+            self.data["time"] = df.index.to_numpy(dtype='datetime64[ns]').astype('float64') // 10**9
             self.data["depth"] = np.array(df.columns)
             self.data["temp"] = np.array(df.T.to_numpy())
         except Exception as e:

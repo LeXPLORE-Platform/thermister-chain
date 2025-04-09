@@ -22,8 +22,11 @@ def pipeline(download=False, process=False, reprocess=False, logs=False, upload=
         except Exception as e:
             print("Processing failed")
             failed = True
+            if reprocess:
+                raise
 
-    if upload or failed:
+
+    if upload or (uploadfiles and failed):
         print("Upload sync with remote bucket")
         sync_files(warning=False, delete=True)
     elif uploadfiles:

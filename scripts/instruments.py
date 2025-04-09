@@ -145,14 +145,14 @@ class TemperatureChainV0(TemperatureChainGeneral):
             "comment": "Data from the Thermistor Chain on LéXPLORE Platform in Lake Geneva",
             "title": "LéXPLORE Thermistor Chain v0"
         }
+        self.dimensions = {
+            'depth': {'dim_name': 'depth', 'dim_size': 48},
+            'time': {'dim_name': 'time', 'dim_size': None}
+        }
 
     def read_data(self, file):
         self.log.info("Reading data from {}".format(file), 1)
         try:
-            depths = [18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2.5, 2, 1.5, 1.25, 1, 0.75, 0.5,
-                      0.25, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24,
-                      21]
-
             self.log.info("Locating partner file", 2)
 
             folder = os.path.join(os.path.dirname(file), "..", "21-90m_depth")
@@ -180,7 +180,9 @@ class TemperatureChainV0(TemperatureChainGeneral):
 
             df = dfs.join(dfd, how="outer", lsuffix="_s", rsuffix="_d")
 
-            df.columns = depths
+            df.columns = [18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2.5, 2, 1.5, 1.25, 1, 0.75, 0.5,
+                      0.25, 90, 87, 84, 81, 78, 75, 72, 69, 66, 63, 60, 57, 54, 51, 48, 45, 42, 39, 36, 33, 30, 27, 24,
+                      21]
             df = df.reindex(sorted(df.columns), axis=1)
 
             self.data["time"] = df.index.to_numpy(dtype='datetime64[ns]').astype('float64') // 10**9
@@ -203,6 +205,10 @@ class TemperatureChainV1(TemperatureChainGeneral):
             "conventions": "CF 1.7",
             "comment": "Data from the Thermistor Chain on LéXPLORE Platform in Lake Geneva",
             "title": "LéXPLORE Thermistor Chain v1"
+        }
+        self.dimensions = {
+            'depth': {'dim_name': 'depth', 'dim_size': 48},
+            'time': {'dim_name': 'time', 'dim_size': None}
         }
 
     def read_data(self, file):
@@ -251,6 +257,10 @@ class TemperatureChainV2(TemperatureChainGeneral):
             "conventions": "CF 1.7",
             "comment": "Data from the Thermistor Chain on LéXPLORE Platform in Lake Geneva",
             "title": "LéXPLORE Thermistor Chain v2"
+        }
+        self.dimensions = {
+            'depth': {'dim_name': 'depth', 'dim_size': 48},
+            'time': {'dim_name': 'time', 'dim_size': None}
         }
 
     def read_data(self, file):
@@ -302,6 +312,10 @@ class TemperatureChainV3(TemperatureChainGeneral):
             "conventions": "CF 1.7",
             "comment": "Data from the Thermistor Chain on LéXPLORE Platform in Lake Geneva",
             "title": "LéXPLORE Thermistor Chain v3"
+        }
+        self.dimensions = {
+            'depth': {'dim_name': 'depth', 'dim_size': 27},
+            'time': {'dim_name': 'time', 'dim_size': None}
         }
 
     def read_data(self, file):

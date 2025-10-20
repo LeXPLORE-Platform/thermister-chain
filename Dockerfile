@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.12.0
+FROM condaforge/miniforge3:25.3.1-0
 RUN mkdir /repository
 COPY environment.yml /environment.yml
 RUN conda env create -f /environment.yml

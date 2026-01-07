@@ -28,7 +28,7 @@ dependencies:
       - cmocean==4.0.3
       - gsw==3.6.19
       - seawater==3.3.5
-      - pylake==0.1.11
+      - pylake==0.1.12
       - pyrsktools==1.1.1
       - envass==1.0.0
       - dolfyn==0.12.3

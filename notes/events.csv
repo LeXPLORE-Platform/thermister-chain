@@ -93,3 +93,5 @@ start;stop;parameter;depth;comments
 20260122 00:15:00;20260122 00:35:00;All;80;Sensor failure
 20260125 10:05:00;20260125 10:25:00;All;45;Sensor failure
 20260125 10:25:00;20260125 10:45:00;All;70;Sensor failure
+20260127 00:05:00;20260127 00:25:00;All;70;Sensor failure
+20260128 11:45:00;20260128 12:05:00;All;70;Sensor failure

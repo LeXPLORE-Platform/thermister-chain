@@ -7,7 +7,7 @@ import warnings
 from pyrsktools import RSK
 import numpy as np
 import pandas as pd
-from scipy.interpolate import griddata
+from scipy.interpolate import griddata, interp1d
 from datetime import datetime, timedelta, timezone
 from general.functions import GenericInstrument, json_converter
 from functions import get_bathymetry, temperature_gradient_check, nan_helper
@@ -101,26 +101,58 @@ class TemperatureChainGeneral(GenericInstrument):
 
         bathymetry_depth, bathymetry_area = get_bathymetry(bathymetry_file, self.data['depth'])
 
-        #hTH, _ = pylake.thermocline(self.data['temp'], self.data['depth'])
-        hML = pylake.mixed_layer(self.data['temp'], self.data['depth'], threshold=1)
-        schmidt_stability = pylake.schmidt_stability(self.data['temp'], self.data['depth'], bthA=bathymetry_area,
-                                                     bthD=bathymetry_depth, sal=0.2, g=9.81)
-        heat_content = pylake.heat_content(self.data['temp'], bthA=bathymetry_area, bthD=bathymetry_depth,
-                                           depth=self.data['depth'], s=0.2)
+        depth_resolution = 1
+        max_depth = 90
+        depth_interp = np.arange(0,max_depth + depth_resolution,depth_resolution)
 
-        epi_depth,hypo_depth = pylake.metalimnion(self.data['temp'], self.data['depth'], slope=0.5, slope_calc='relative', seasonal=True, mixed_cutoff=1, smooth=True, s=0.2)
-        result = np.empty(len(epi_depth))
+        # Initialize the array to store interpolated values
+        temp_interp = np.empty((len(depth_interp), len(self.data['time'])))
 
-        # Compute thermocline depth from epilimnion and hypolimnion depths
-        for i in range(len(epi_depth)):
-            epi_temp = np.interp(epi_depth[i],self.data['depth'],self.data['temp'][:,i])
-            hypo_temp = np.interp(hypo_depth[i],self.data['depth'],self.data['temp'][:,i])
-            meta_temp = (epi_temp + hypo_temp)/2
-            meta_depth = np.interp(-meta_temp,-self.data['temp'][:,i],self.data['depth'])
-            result[i] = meta_depth
+        mixed_layer = np.empty(len(self.data['time']))
+        mixed_layer[:] = np.nan
 
-        self.data['thermocline_depth'] = result
-        self.data["mixed_layer_depth"] = hML
+        thermocline_depth = np.empty(len(self.data['time']))
+        thermocline_depth[:] = np.nan
+
+        schmidt_stability = np.empty(len(self.data['time']))
+        schmidt_stability[:] = np.nan
+
+        heat_content = np.empty(len(self.data['time']))
+        heat_content[:] = np.nan
+
+        indices = []
+
+        # Perform depth interpolation for each time step
+        for i in range(len(self.data['time'])):
+            # Extract the temperature column for the current time step
+            temp_column = self.data['temp'][:, i]
+            
+            # Handle NaNs: Mask NaN values
+            mask = ~np.isnan(temp_column)
+            
+            # Extract valid depths and temperatures
+            depth_valid = self.data['depth'][mask]
+            temp_valid = temp_column[mask]
+
+            # --- checks ---
+            enough_points = depth_valid.size >= 20
+            has_surface = np.any(depth_valid <= 1)
+            has_bottom  = np.any(depth_valid >= 80)
+
+            if enough_points and has_surface and has_bottom:
+                # Create interpolation function using only non-NaN values
+                f_interp = interp1d(self.data['depth'][mask], temp_column[mask], kind='linear', fill_value="extrapolate")
+                temp_interp[:, i] = f_interp(depth_interp)
+                indices.append(i)
+
+        if indices:
+            mixed_layer[indices] = pylake.mixed_layer(temp_interp[:, indices], depth_interp, s=0.2, threshold=0.001)
+            schmidt_stability[indices] = pylake.schmidt_stability(temp_interp[:, indices], depth_interp, bthA=bathymetry_area,bthD=bathymetry_depth, sal=0.2, g=9.81)
+            heat_content[indices] = pylake.heat_content(temp_interp[:, indices], bthA=bathymetry_area, bthD=bathymetry_depth,depth=depth_interp, s=0.2)
+            thermocline_depth[indices] = pylake.robust_thermocline(temp_interp[:, indices], depth_interp, s=0.2)
+
+        self.data["thermocline_depth"] = thermocline_depth
+        self.data["mixed_layer_depth"] = mixed_layer
         self.data["schmidt_stability"] = schmidt_stability
         self.data["heat_content"] = heat_content
 

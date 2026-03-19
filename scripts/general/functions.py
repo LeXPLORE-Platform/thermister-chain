@@ -254,6 +254,7 @@ class GenericInstrument:
         for var in self.variables:
             if var + "_qual" in self.data:
                 idx = self.data[var + "_qual"][:] > 0
+                self.data[var] = np.array(self.data[var], dtype=float)
                 self.data[var][idx] = np.nan
 
     def profile_to_timeseries_grid(self, time_label="time", depth_label="depth"):

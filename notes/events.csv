@@ -112,3 +112,4 @@ start;stop;parameter;depth;comments
 20260315 10:35:00;20260315 10:55:00;All;70;Sensor failure
 20260315 16:35:00;20260315 16:55:00;All;70;Sensor failure
 20260515 07:45:00;20260515 08:05:00;Water temperature;40;Bad sensor value
+20260617 11:00:00;20260618 12:00:00;Water temperature,Surface temperature,Bottom temperature,Mixing depth,Thermocline Depth,Schmidt Stability,Heat Content;;Sensor values are constant and it looks like the top few sensors were out of the water.

@@ -30,7 +30,7 @@ dependencies:
       - seawater==3.3.5
       - pylake==0.1.13
       - pyrsktools==1.1.1
-      - envass==1.0.0
+      - envass==1.0.2
       - dolfyn==0.12.3
       - monda==0.2.0
       - pysftp==0.2.9

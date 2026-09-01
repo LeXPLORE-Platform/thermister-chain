@@ -108,3 +108,4 @@ start;stop;parameter;depth;comments
 20260330 06:35:00;20260330 06:55:00;All;65;Sensor failure
 20260401 20:35:00;20260401 20:55:00;All;60;Sensor failure
 20260402 14:25:00;20260402 14:45:00;All;80;Sensor failure
+20260705 21:46:41;20260705 23:46:00;Water temperature;;Test
